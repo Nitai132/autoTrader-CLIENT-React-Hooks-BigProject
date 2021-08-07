@@ -1,24 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
+import HomePage from './components/HomePage';
+import Login from './components/Login';
+import Register from './components/Register';
+import Contact from './components/Contact';
+import Payment from './components/Payment'
+import PositionsTable from './components/PositionsTable';
 
-function App() {
+
+
+function App() { //פונקציה ראשית - ריאקט ראוטר (מייצר עמודים שונים באתר)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/payment" component={Payment} />
+        <Route path="/positions" component={PositionsTable} />
+        <Route path="/" component={HomePage} />
+      </Switch>
+    </Router>
+
+
   );
 }
 
