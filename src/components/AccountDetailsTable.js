@@ -69,7 +69,7 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
     return (
         <div>
             <h2 style={{ display: 'inline', position: 'relative', right: '350px', top: '50px' }}>
-                Client Status:
+                Gateway Status:
                 {gatewayStatus === false && <span style={{ marginLeft: '10px', color: 'red' }}>
                     Dissconnected <FiberManualRecordIcon style={{ color: 'red', position: 'relative', top: '5px' }} />
                 </span>}
@@ -87,7 +87,6 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                 <tbody>
 
                     <tr>
-                        <th style={{ fontSize: '25px', padding: '20px' }}>Account Name</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Invested balance</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Current balance</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Profit/Loss</th>
@@ -96,16 +95,13 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                     </tr>
                     <tr>
                         <td style={{ fontSize: '20px' }}>
-                            {currentAccount.charAt(0).toUpperCase() + currentAccount.slice(1)}
+                            {info.investedBalance.dollars} $
                         </td>
                         <td style={{ fontSize: '20px' }}>
-                            {info.investedBalance.credits} credits
+                            {info.currentBalance.dollars} $
                         </td>
                         <td style={{ fontSize: '20px' }}>
-                            {info.currentBalance.credits} credits
-                        </td>
-                        <td style={{ fontSize: '20px' }}>
-                            {info.profitLoss.credits} credits used
+                            {info.profitLoss.dollars} $
                         </td>
                         <td style={{ fontSize: '20px' }}>
                             sell: {info.tradesAmount.sell} trades
@@ -120,17 +116,16 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                     </tr>
                     <tr>
                         <td></td>
-                        <td style={{ fontSize: '20px' }}>
-                            {info.investedBalance.dollars} $
-                        </td>
-                        <td style={{ fontSize: '20px' }}>
-                            {info.currentBalance.dollars} $
-                        </td>
-                        <td style={{ fontSize: '20px' }}>
-                            {info.profitLoss.dollars} $
-                        </td>
+                        <td></td>
+                        <td></td>
                         <td style={{ fontSize: '20px' }}>
                             buy: {info.tradesAmount.buy} trades
+                        </td>
+                        <td>
+                        <Button variant="contained" color="secondary"
+                            >
+                                Click Here to see reports
+                            </Button>
                         </td>
                     </tr>
                 </tbody>

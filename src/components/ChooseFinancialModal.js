@@ -23,17 +23,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ChooseFinancialModal = ({ 
-  currentAccount, 
-  setFinancialTech, 
-  setRates, 
-  defaults, 
-  defaultRates
+const ChooseFinancialModal = ({
+  currentAccount,
+  setFinancialTech,
+  setRates,
+  defaults,
+  defaultRates,
+  unSavedChangesFlag
 }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState(defaults);
-
   const [stocksRates, setStocksRates] = React.useState(defaultRates[0])
   const [optionsRates, setOptionsRates] = React.useState(defaultRates[1])
   const [futureContractsRates, setFutureContractsRates] = React.useState(defaultRates[2])
@@ -57,9 +57,23 @@ const ChooseFinancialModal = ({
     setState({ ...state, [event.target.name]: event.target.checked });
   };
 
-  const handleAmountChange = (event) => {
-    setState({ ...state, [event.target.name]: Number(event.target.value) });
+  const handleStocksAmountChange = (event) => {
+    setStocksRates({ ...stocksRates, [event.target.name]: Number(event.target.value) });
   };
+
+  
+  const handleOptionsAmountChange = (event) => {
+    setOptionsRates({ ...optionsRates, [event.target.name]: Number(event.target.value) });
+  };
+
+  const handleContractAmountChange = (event) => {
+    setFutureContractsRates({ ...futureContractsRates, [event.target.name]: Number(event.target.value) });
+  };
+
+  const handleOptionOnContractAmountChange = (event) => {
+    setFutureContractsOptionsRates({ ...futureContractsOptionsRates, [event.target.name]: Number(event.target.value) });
+  };
+
 
   const handleStocksRatesChange = (event) => {
     setStocksRates({ ...stocksRates, [event.target.name]: event.target.checked });
@@ -77,8 +91,11 @@ const ChooseFinancialModal = ({
     setFutureContractsOptionsRates({ ...futureContractsOptionsRates, [event.target.name]: event.target.checked });
   };
 
+  const handleAmountChange = ()=> {
+
+  }
+
   const handleClickOpen = () => {
-    console.log(defaultRates)
     setOpen(true);
   };
 
@@ -89,7 +106,8 @@ const ChooseFinancialModal = ({
 
   const confirmAndClose = () => {
     setFinancialTech(state);
-    setRates([stocksRates, optionsRates, futureContractsRates, futureContractsOptionsRates])
+    unSavedChangesFlag(true);
+    setRates([stocksRates, optionsRates, futureContractsRates, futureContractsOptionsRates]);
     setOpen(false);
     alertify.success(`Changes set. click on save changes to save them`);
   };
@@ -97,15 +115,17 @@ const ChooseFinancialModal = ({
   return (
     <div id="modalsContainer">
 
-      <Button id="changeBalanceModal" variant="contained" color="primary" style={{ position: 'relative', left: '440px', bottom: '35px', width: '300px'  }}
+      <Button id="changeBalanceModal" variant="contained" color="primary" style={{ position: 'relative', bottom: '114px', width: '300px' }}
         onClick={handleClickOpen}
       >
         Choose Financial Technology
-      </Button>        <Dialog open={open} onClose={handleClose}>
-        <DialogTitle><h3 style={{ textAlign: 'center' }}>Choose the type of financial technology you would like to use</h3></DialogTitle>
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
+          <h3 style={{ textAlign: 'center' }}>Choose the type of financial technology you would like to use</h3></DialogTitle>
         <DialogContent style={{ textAlign: 'center' }}>
           {currentAccount === 'stocks' && <p style={{ fontSize: '20px' }}>
-            Stocks
+            Stocksּ
             <Checkbox
               checked={state.Stocks}
               name="Stocks"
@@ -122,27 +142,69 @@ const ChooseFinancialModal = ({
                 onChange={handleStocksRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              100-200$
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_5_amount"
+                value={stocksRates._5_amount}
+                onChange={handleStocksAmountChange}
+              />
+              <br />
+              100-249$
               <Checkbox
                 checked={stocksRates._100 || false}
                 name="_100"
                 onChange={handleStocksRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              200$+
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_100_amount"
+                value={stocksRates._100_amount}
+                onChange={handleStocksAmountChange}
+              />
+              <br />
+              250-500$
               <Checkbox
-                checked={stocksRates._200 || false}
-                name="_200"
+                checked={stocksRates._250 || false}
+                name="_250"
                 onChange={handleStocksRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              <br />
               Stocks per trade:
               <input type="number" style={{ width: '50px' }}
-                name="StocksAmount"
-                value={state.StocksAmount}
-                onChange={handleAmountChange}
+                name="_250_amount"
+                value={stocksRates._250_amount}
+                onChange={handleStocksAmountChange}
               />
+              <br />
+              500-999$
+              <Checkbox
+                checked={stocksRates._500 || false}
+                name="_500"
+                onChange={handleStocksRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_500_amount"
+                value={stocksRates._500_amount}
+                onChange={handleStocksAmountChange}
+              />
+              <br />
+              1000+
+              <Checkbox
+                checked={stocksRates._1000 || false}
+                name="_1000"
+                onChange={handleStocksRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_1000_amount"
+                value={stocksRates._1000_amount}
+                onChange={handleStocksAmountChange}
+              />
+              <br />
             </div>}
           </p>}
           <p style={{ fontSize: '20px' }}>
@@ -163,27 +225,69 @@ const ChooseFinancialModal = ({
                 onChange={handleOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              100-200$
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_5_amount"
+                value={optionsRates._5_amount}
+                onChange={handleOptionsAmountChange}
+              />
+              <br />
+              100-249$
               <Checkbox
                 checked={optionsRates._100 || false}
                 name="_100"
                 onChange={handleOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              200$+
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_100_amount"
+                value={optionsRates._100_amount}
+                onChange={handleOptionsAmountChange}
+              />
+              <br />
+              250-500$
               <Checkbox
-                checked={optionsRates._200 || false}
-                name="_200"
+                checked={optionsRates._250 || false}
+                name="_250"
                 onChange={handleOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              <br />
-              Options per trade:
+              Stocks per trade:
               <input type="number" style={{ width: '50px' }}
-                name="OptionsAmount"
-                value={state.OptionsAmount}
-                onChange={handleAmountChange}
+                name="_250_amount"
+                value={stocksRates._250_amount}
+                onChange={handleOptionsAmountChange}
               />
+              <br />
+              500-999$
+              <Checkbox
+                checked={optionsRates._500 || false}
+                name="_500"
+                onChange={handleOptionsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_500_amount"
+                value={optionsRates._500_amount}
+                onChange={handleOptionsAmountChange}
+              />
+              <br />
+              1000+
+              <Checkbox
+                checked={optionsRates._1000 || false}
+                name="_1000"
+                onChange={handleOptionsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_1000_amount"
+                value={optionsRates._1000_amount}
+                onChange={handleOptionsAmountChange}
+              />
+              <br />
             </div>}
           </p>
           <p style={{ fontSize: '20px' }}>
@@ -197,6 +301,7 @@ const ChooseFinancialModal = ({
             {state.FutureContract === true && <div>
               Future Contracts rates:
               <br />
+                          <br />
               5-100$
               <Checkbox
                 checked={futureContractsRates._5 || false}
@@ -204,30 +309,73 @@ const ChooseFinancialModal = ({
                 onChange={handleFutureContractsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              100-200$
+              Contracts per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_5_amount"
+                value={futureContractsRates._5_amount}
+                onChange={handleContractAmountChange}
+              />
+              <br />
+              100-249$
               <Checkbox
                 checked={futureContractsRates._100 || false}
                 name="_100"
                 onChange={handleFutureContractsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              200$+
+              Contracts per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_100_amount"
+                value={futureContractsRates._100_amount}
+                onChange={handleContractAmountChange}
+              />
+              <br />
+              250-499$
               <Checkbox
-                checked={futureContractsRates._200 || false}
-                name="_200"
+                checked={futureContractsRates._250 || false}
+                name="_250"
                 onChange={handleFutureContractsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              <br />
-              Future contracts per trade:
+              Contracts per trade:
               <input type="number" style={{ width: '50px' }}
-                name="FutureContractAmount"
-                value={state.FutureContractAmount}
-
-                onChange={handleAmountChange}
+                name="_250_amount"
+                value={futureContractsRates._250_amount}
+                onChange={handleContractAmountChange}
+              />
+              <br />
+              500-999$
+              <Checkbox
+                checked={futureContractsRates._500 || false}
+                name="_500"
+                onChange={handleFutureContractsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Contracts per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_500_amount"
+                value={futureContractsRates._500_amount}
+                onChange={handleContractAmountChange}
+              />
+              <br />
+              1000+
+              <Checkbox
+                checked={futureContractsRates._1000 || false}
+                name="_1000"
+                onChange={handleFutureContractsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Contracts per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_1000_amount"
+                value={futureContractsRates._1000_amount}
+                onChange={handleContractAmountChange}
               />
             </div>}
           </p>
+
+
+
           <p style={{ fontSize: '20px' }}>
             Future contacts options
             <Checkbox
@@ -246,27 +394,69 @@ const ChooseFinancialModal = ({
                 onChange={handleCFutureContractsOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              100-200$
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_5_amount"
+                value={futureContractsOptionsRates._5_amount}
+                onChange={handleOptionOnContractAmountChange}
+              />
+              <br />
+              100-249$
               <Checkbox
                 checked={futureContractsOptionsRates._100 || false}
                 name="_100"
                 onChange={handleCFutureContractsOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              200$+
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_100_amount"
+                value={futureContractsOptionsRates._100_amount}
+                onChange={handleOptionOnContractAmountChange}
+              />
+              <br />
+              250-500$
               <Checkbox
-                checked={futureContractsOptionsRates._200 || false}
-                name="_200"
+                checked={futureContractsOptionsRates._250 || false}
+                name="_250"
                 onChange={handleCFutureContractsOptionsRatesChange}
                 inputProps={{ 'aria-label': 'primary checkbox' }}
               />
-              <br />
-              Future contract options per trade:
+              Stocks per trade:
               <input type="number" style={{ width: '50px' }}
-                name="FutureContractOptionsAmount"
-                value={state.FutureContractOptionsAmount}
-                onChange={handleAmountChange}
+                name="_250_amount"
+                value={futureContractsOptionsRates._250_amount}
+                onChange={handleOptionOnContractAmountChange}
               />
+              <br />
+              500-999$
+              <Checkbox
+                checked={futureContractsOptionsRates._500 || false}
+                name="_500"
+                onChange={handleCFutureContractsOptionsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_500_amount"
+                value={futureContractsOptionsRates._500_amount}
+                onChange={handleOptionOnContractAmountChange}
+              />
+              <br />
+              1000+
+              <Checkbox
+                checked={futureContractsOptionsRates._1000 || false}
+                name="_1000"
+                onChange={handleCFutureContractsOptionsRatesChange}
+                inputProps={{ 'aria-label': 'primary checkbox' }}
+              />
+              Stocks per trade:
+              <input type="number" style={{ width: '50px' }}
+                name="_1000_amount"
+                value={futureContractsOptionsRates._1000_amount}
+                onChange={handleOptionOnContractAmountChange}
+              />
+              <br />
             </div>}
           </p>
         </DialogContent>

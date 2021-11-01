@@ -16,7 +16,6 @@ import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
-import ChangeBalanceModal from './ChangeBalanceModal';
 import ChooseSymbolsModal from './ChooseSymbolsModal';
 import ChooseFinancialModal from './ChooseFinancialModal';
 import RiskManagmentModal from './RiskManagmentModal';
@@ -24,6 +23,7 @@ import SetTimeModal from './SetTimeModal';
 import SetStopLossModal from './SetStopLossModal';
 import ExitPositionsModal from './ExitPositionsModal';
 import _ from 'lodash';
+import SetDoubleTheTrade from './SetDoubleTheTrade';
 
 
 // פונקציה שמוצאת ברייק פוינטס רספונסיביים ומחלקת אותם לקטגוריות לפי גודל המסך
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({ //שימוש בסטיילינג לפ�
 const HomePage = () => { //פונקציה דף ראשי
   const classes = useStyles(); //שימוש בסטיילינג לקלאסים
   const history = useHistory(); // ריאקט הוקס - ראוטר
-  const [activeTradingStatus, setactiveTradingStatus] = useState('Not Active');
+  const [activeTradingStatus, setactiveTradingStatus] = useState();
   const [value, setValue] = React.useState(0);
   const [currentAccount, setCurrentAccount] = useState('stocks')
   const [activeAccount, setActiveAccount] = useState(false);
@@ -95,7 +95,7 @@ const HomePage = () => { //פונקציה דף ראשי
   const [riskManagment, setRiskManagment] = useState({});
   const [times, setTimes] = useState({});
   const [stopLoss, setStopLoss] = useState({});
-  const [symbols, setSymbols] = useState({ groups: [], notToUse: [] });
+  const [symbols, setSymbols] = useState([]);
   const [tradesPerDay, setTradesPerDay] = useState(0);
   const [stocksRates, setStocksRates] = useState({});
   const [optionsRates, setOptionsRates] = useState({});
@@ -105,7 +105,9 @@ const HomePage = () => { //פונקציה דף ראשי
   const [userPremission, setUserPremission] = useState(''); //סטייט של הראשות משתמש
   const [userCredits, setUserCredits] = useState(0); //סטייט של קרדיט שיש למשתמש
   const [userEmail, setUserEmail] = useState(''); //סטייט אימייל של המשתמש
+  const [doubleTheTradeValues, setDoubleTheTradeValues] = useState({ Stocks: false, Options: false });
   const isWindowClient = typeof window === "object";
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [windowSize, setWindowSize] = useState(
     isWindowClient
       ? getBreakPoint(window.innerWidth) //👈
@@ -221,9 +223,10 @@ const HomePage = () => { //פונקציה דף ראשי
           times,
           symbols,
           rates,
-          tradesPerDay
+          tradesPerDay,
+          doubleTheTradeValues
         }).then(() => {
-          alertify.alert('Your changes has been saves successfullyy');
+          alertify.alert('Your changes has been saved successfully');
         });
       } else {
         alertify.alert('Unsigned User', 'Login to use this button');
@@ -232,6 +235,26 @@ const HomePage = () => { //פונקציה דף ראשי
       console.log(err);
     };
   };
+
+  const ChangeactiveTradingStatus = async (tradingStatus) => {
+    try {
+      setactiveTradingStatus(tradingStatus);
+      axios.post('/usersSetup/changeTradingStatus', {
+        userEmail: userEmail,
+        tradingStatus: !tradingStatus
+      })
+
+    } catch (err) {
+      console.log(err);
+      alertify.alert('Something went wrong', 'Something went wrong while trying to change trading status')
+    }
+  }
+
+  const unSavedChangesFlag = async (flag) => {
+    setUnsavedChanges(flag);
+    console.log(unsavedChanges)
+
+  }
 
   useEffect(async () => { //בעלייה הראשונה של הדף
     const userDetails = await axios.get('/auth/userDetails'); //בודק אם המשתמש מחובר ואם כן מביא את הפרטים שלו
@@ -256,6 +279,7 @@ const HomePage = () => { //פונקציה דף ראשי
       setFutureContractsRatesRates(data[currentAccount].rates.futureContracts);
       setFutureContractsOptionsRatesRates(data[currentAccount].rates.futureContractOptions);
       setTradesPerDay(data[currentAccount].tradesPerDay);
+      setDoubleTheTradeValues(data.doubleTheTradeValues);
     }
   }, [userFirstName]);
 
@@ -274,8 +298,14 @@ const HomePage = () => { //פונקציה דף ראשי
       setFutureContractsRatesRates(data[currentAccount].rates.futureContracts);
       setFutureContractsOptionsRatesRates(data[currentAccount].rates.futureContractOptions);
       setTradesPerDay(data[currentAccount].tradesPerDay);
+      setDoubleTheTradeValues(data.doubleTheTradeValues);
     }
   }, [currentAccount]);
+
+  useEffect(async () => {
+    const tradingStatus = await axios.get(`/usersSetup/getTradingStatus/${userEmail}`);
+    setactiveTradingStatus(tradingStatus.data);
+  }, [userEmail])
 
   return (
     <div className={classes.root}>
@@ -299,37 +329,25 @@ const HomePage = () => { //פונקציה דף ראשי
             </Grid>}
 
             {userFirstName === 'Guest' && windowSize !== 'xs' && <Grid item xs={5} sm={1}>
-              <Typography variant="h5" className={classes.title} style={{ color: 'black', position: 'relative', bottom: '20px' }}>
+              <Typography variant="h5" className={classes.title} style={{ color: 'black', fontSize: '28px', position: 'relative', bottom: '20px', left: '40px' }}>
                 Hello Guest
               </Typography>
             </Grid>}
 
             {userFirstName === 'Guest' && <Grid item xs={5} sm={1}>
-              <Typography variant="h5" className={classes.title} style={{ position: 'relative', bottom: '20px' }}>
+              <Typography variant="h5" className={classes.title} style={{ color: 'black', fontSize: '28px' }}>
               </Typography>
             </Grid>}
 
             {userFirstName === 'Guest' && windowSize === 'xs' && <Grid item xs={5} sm={1}>
-              <Typography variant="h5" className={classes.title} style={{ color: 'black', position: 'relative', bottom: '20px' }}>
+              <Typography variant="h5" className={classes.title} style={{ color: 'black', position: 'relative', bottom: '20px', left: '40px' }}>
                 Hello Guest
               </Typography>
             </Grid>}
 
-            {userFirstName !== 'Guest' && <Grid item xs={5} sm={1} style={{ position: 'relative', bottom: '20px', right: '20px' }} >
-              <Typography variant="h5" className={classes.title} style={{ color: 'black' }}>
+            {userFirstName !== 'Guest' && <Grid item xs={5} sm={2} style={{ position: 'relative', bottom: '20px', left: '40px'}} >
+              <Typography variant="h5" className={classes.title} style={{ color: 'black', fontSize: '28px'}}>
                 Hello {userFirstName}
-              </Typography>
-            </Grid>}
-
-            {userFirstName !== 'Guest' && windowSize !== 'xs' && <Grid item xs={5} sm={1} style={{ position: 'relative', right: '20px', bottom: '20px' }}>
-              <Typography variant="h5" className={classes.title} style={{ color: 'black' }}>
-                balance: {userCredits}
-              </Typography>
-            </Grid>}
-
-            {userFirstName !== 'Guest' && windowSize === 'xs' && <Grid item xs={5} sm={1} style={{ position: 'relative', right: '20px', position: 'relative', bottom: '20px' }}>
-              <Typography variant="h5" className={classes.title} style={{ color: 'black', position: 'relative', left: '40px' }}>
-                balance: {userCredits}
               </Typography>
             </Grid>}
 
@@ -341,11 +359,22 @@ const HomePage = () => { //פונקציה דף ראשי
                 value={5}
                 style={{ backgroundColor: 'lightgrey', height: '60px', color: 'black' }}
               >
-                {activeTradingStatus === 'Not Active' && <Tab label="Start Trading"
+                {activeTradingStatus === false && <Tab label="Start Trading"
                   style={{ height: '60px', backgroundColor: 'green', fontSize: '17px', color: 'white' }}
                   onClick={() => {
                     if (userFirstName !== 'Guest') {
-                      setactiveTradingStatus('Active');
+                      if (unsavedChanges === false) {
+                        ChangeactiveTradingStatus(true);
+                      } else {
+                        alertify.confirm('Unsaved Changes', 'You have unsaved changes, would you like to continue without saving?', function () {
+                          alertify.success('Changes Saved');
+                          saveChanges();
+                        }
+                          , function () {
+                            alertify.error('Changes were not saved');
+                          });
+                        setUnsavedChanges(false);
+                      }
                     }
                     else {
                       alertify.alert('Unsigned User', 'Login to use this button');
@@ -353,9 +382,9 @@ const HomePage = () => { //פונקציה דף ראשי
                   }}
                 />}
 
-                {activeTradingStatus === 'Active' && <Tab label="Stop Trading"
+                {activeTradingStatus === true && <Tab label="Stop Trading"
                   style={{ height: '60px', backgroundColor: 'red', fontSize: '17px', color: 'white' }}
-                  onClick={() => setactiveTradingStatus('Not Active')}
+                  onClick={() => ChangeactiveTradingStatus(false)}
                 />}
 
 
@@ -386,11 +415,11 @@ const HomePage = () => { //פונקציה דף ראשי
                 />}
                 {userFirstName === 'Guest' && <Tab label="Login"
                   onClick={() => history.push('/login')}
-                  style={{ height: '60px', backgroundColor: 'red', fontSize: '17px', color: 'white' }}
+                  style={{ height: '60px', backgroundColor: 'green', fontSize: '17px', color: 'white' }}
                 />}
                 {userFirstName === 'Guest' && <Tab label="Register"
                   onClick={() => history.push('/register')}
-                  style={{ height: '60px', backgroundColor: 'blue', fontSize: '17px', color: 'white' }}
+                  style={{ height: '60px', backgroundColor: 'red', fontSize: '17px', color: 'white' }}
                 />}
 
               </Tabs>
@@ -417,10 +446,10 @@ const HomePage = () => { //פונקציה דף ראשי
       <div style={{ width: '85%', float: 'right', height: '78vh', alignItems: 'center', textAlign: 'center' }}>
         <h2 style={{ display: 'inline', position: 'relative', top: '80px', right: '30px' }}>
           Auto Trader Status:
-          {activeTradingStatus === 'Not Active' && <span style={{ marginLeft: '10px', color: 'red' }}>
+          {activeTradingStatus === false && <span style={{ marginLeft: '10px', color: 'red' }}> Not Active
             {activeTradingStatus} <FiberManualRecordIcon style={{ color: 'red', position: 'relative', top: '7px' }} />
           </span>}
-          {activeTradingStatus === 'Active' && <span style={{ marginLeft: '10px', color: 'green' }}>
+          {activeTradingStatus === true && <span style={{ marginLeft: '10px', color: 'green' }}> Active
             {activeTradingStatus} <FiberManualRecordIcon style={{ color: 'green', position: 'relative', top: '7px' }} />
           </span>}
         </h2>
@@ -438,7 +467,7 @@ const HomePage = () => { //פונקציה דף ראשי
               color="primary"
             />
           </span>
-          <span style={{ fontSize: '20px', position: 'relative', right: '30px' }}>
+          <span style={{ fontSize: '20px', position: 'relative', right: '440px', top: '100px' }}>
             Get Sell Positions
             <Switch
               checked={sellPositions}
@@ -447,7 +476,7 @@ const HomePage = () => { //פונקציה דף ראשי
               color="primary"
             />
           </span>
-          <span style={{ fontSize: '20px', position: 'relative', left: '210px' }}>
+          <span style={{ fontSize: '20px', position: 'relative', right: '650px', top: '200px' }}>
             Get Buy Positions
             <Switch
               checked={buyPositions}
@@ -459,33 +488,47 @@ const HomePage = () => { //פונקציה דף ראשי
           <br />
           <br />
           <br />
-          <ChangeBalanceModal
-            currentAccount={currentAccount}
-          />
           <ChooseSymbolsModal
             currentAccount={currentAccount}
+            userEmail={userEmail}
+            setUserSymbols={(symbols) => setSymbols(symbols)}
+            financialTech={financialTech}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
           />
           <ChooseFinancialModal
             currentAccount={currentAccount}
             setFinancialTech={(values) => setFinancialTech(values)}
             setRates={(values) => handleSetRates(values)}
             defaults={financialTech}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
             defaultRates={[stocksRates, optionsRates, futureContractsRates, futureContractsOptionsRates]}
           />
           <RiskManagmentModal
             currentAccount={currentAccount}
             setRiskManagment={(values) => setRiskManagment(values)}
             defaults={riskManagment}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
+
           />
           <SetTimeModal
             currentAccount={currentAccount}
             setTimes={(values) => setTimes(values)}
             defaults={times}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
+
           />
           <SetStopLossModal
             currentAccount={currentAccount}
             setStopLoss={(values) => setStopLoss(values)}
             defaults={stopLoss}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
+
+          />
+          <SetDoubleTheTrade
+            currentAccount={currentAccount}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
+            setDoubleTheTradeValues={(value) => setDoubleTheTradeValues(value)}
+            defaults={doubleTheTradeValues}
           />
           <ExitPositionsModal
             currentAccount={currentAccount}
@@ -494,7 +537,7 @@ const HomePage = () => { //פונקציה דף ראשי
             userEmail={userEmail}
           />
           <br />
-          <span style={{ fontSize: '20px', position: 'relative', right: '420px', top: '30px' }}>
+          <span style={{ fontSize: '20px', position: 'relative', right: '420px', bottom: '15px' }}>
             Amount of trades per day (1-20)
             <input type="number" style={{ width: '30px' }} min="0" max="20"
               value={tradesPerDay}
@@ -503,12 +546,13 @@ const HomePage = () => { //פונקציה דף ראשי
           </span>
           <br />
 
-          <Button variant="contained" color="secondary" style={{ position: 'relative', left: '136px', width: '300px' }}
+          <Button variant="contained" color="secondary" style={{ position: 'relative', bottom: '45px', left: '150px', width: '300px' }}
             onClick={() => saveChanges()}
           >
             Save changes
           </Button>
-          <Button variant="contained" style={{ position: 'relative', left: '292px', backgroundColor: 'lightgreen', width: '300px' }}
+          <Button variant="contained" style={{ position: 'relative', right: '150px', bottom: '142px', backgroundColor: 'lightgreen', width: '300px' }}
+            onClick={() => console.log(symbols)}
           >
             Take profits
           </Button>

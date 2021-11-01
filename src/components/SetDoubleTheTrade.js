@@ -9,7 +9,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import alertify from 'alertifyjs';
 import 'alertifyjs/build/css/alertify.css';
 
-
 const useStyles = makeStyles((theme) => ({
   container: {
     display: 'flex',
@@ -24,21 +23,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const RiskManagmentModal = ({ currentAccount, setStopLoss, defaults, unSavedChangesFlag }) => {
+const SetDoubleTheTrade = ({
+  currentAccount,
+  unSavedChangesFlag,
+  setDoubleTheTradeValues,
+  defaults
+}) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
-  const [state, setState] = React.useState(defaults);
+  const [state, setState] = React.useState({
+    Stocks: false,
+    Options: true
+  });
 
-
-  useEffect( ()=> {
-    setState(defaults);
-  }, [defaults]);
-
+  useEffect(() => {
+    setState(defaults)
+  }, [defaults])
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
   };
-
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -50,46 +54,42 @@ const RiskManagmentModal = ({ currentAccount, setStopLoss, defaults, unSavedChan
   };
 
   const confirmAndClose = () => {
-    setStopLoss(state);
-    setOpen(false);
+    setDoubleTheTradeValues(state);
     unSavedChangesFlag(true);
+    setOpen(false);
     alertify.success(`Changes set. click on save changes to save them`);
   };
 
-  const useSystemStopLoss = state.useSystemStopLoss
-    ? null
-    : 
-    <p>
-    if not please set your own stop loss by precentage (%)
-    <input type="number"
-      name="userStoploss"
-      value={state.userStopLoss}
-      onChange={({ target }) => setState({ ...state, userStopLoss: Number(target.value) })}
-    />
-  </p>;
-
   return (
     <div id="modalsContainer">
-
-      <Button id="changeBalanceModal" variant="contained" color="primary" 
-      style={{ position: 'relative', left: '440px', bottom: '220px', width: '300px' }}
+      <Button id="changeBalanceModal" variant="contained" color="primary" style={{ position: 'relative', top: '40px', left: '440px', width: '300px' }}
         onClick={handleClickOpen}
       >
-        Set Stop Loss
-      </Button>       
-       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle><h3 style={{ textAlign: 'center' }}>Set Your {currentAccount} stop loss</h3></DialogTitle>
+        Set Double the trade
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
+          <h2 style={{ textAlign: 'center' }}>Set Double the trade</h2></DialogTitle>
         <DialogContent style={{ textAlign: 'center' }}>
-          <p style={{ fontSize: '20px' }}>
-            Would You like to use our stop loss system?
+        <h3 style={{ textAlign: 'center' }}>use the same signal to trade on both stocks and options</h3>
+          {currentAccount === 'stocks' && <p style={{ fontSize: '20px' }}>
+            Stocksּ
             <Checkbox
-              checked={state.useSystemStopLoss}
-              name="useSystemStopLoss"
+              checked={state.Stocks}
+              name="Stocks"
+              onChange={handleChange}
+              inputProps={{ 'aria-label': 'primary checkbox' }}
+            />
+          </p>}
+          <p style={{ fontSize: '20px' }}>
+            Options
+            <Checkbox
+              checked={state.Options}
+              name="Options"
               onChange={handleChange}
               inputProps={{ 'aria-label': 'primary checkbox' }}
             />
           </p>
-          {useSystemStopLoss}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
@@ -109,4 +109,4 @@ const RiskManagmentModal = ({ currentAccount, setStopLoss, defaults, unSavedChan
 
 }
 
-export default RiskManagmentModal;
+export default SetDoubleTheTrade;

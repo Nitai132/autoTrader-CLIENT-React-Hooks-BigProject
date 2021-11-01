@@ -173,7 +173,7 @@ export default function ContactPage() { //פונקציה ראשית - עמוד �
 
             src={'/Logo.jpg'}
             alt="logo"
-            style={{ width: '380px', position: 'relative', float: 'right', zIndex: '15', bottom: '20px' }}
+            style={{ width: '380px', position: 'relative', float: 'right', zIndex: '15', right: '320px', bottom: '10px' }}
           />
         </Grid>
       </Grid>

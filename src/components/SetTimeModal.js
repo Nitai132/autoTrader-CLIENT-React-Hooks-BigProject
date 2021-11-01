@@ -70,7 +70,7 @@ function getStyles(name, tradingDays, theme) {
 }
 
 
-const SetTimeModal = ({ currentAccount, setTimes, defaults }) => {
+const SetTimeModal = ({ currentAccount, setTimes, defaults, unSavedChangesFlag}) => {
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -117,6 +117,7 @@ const SetTimeModal = ({ currentAccount, setTimes, defaults }) => {
 
     const confirmAndClose = () => {
         setOpen(false);
+        unSavedChangesFlag(true);
         if (!selectFromHour || !selectUntilHour) {
             setTimes({
                 SpecificDays: state.SpecificDays,

@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults }) => {
+const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults, unSavedChangesFlag }) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState(defaults);
@@ -49,6 +49,7 @@ const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults }) => {
 
   const confirmAndClose = () => {
     setRiskManagment(state);
+    unSavedChangesFlag(true);
     setOpen(false);
     alertify.success(`Changes set. click on save changes to save them`);
   };
@@ -76,10 +77,22 @@ const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults }) => {
     </p>
     : null;
 
+    const setRatesInput = state.useRatesRisk
+    ? <p>
+      please set the rates risk managment by precentage of dollars lost from total balance
+      <input type="number"
+        name="dollarsRisk"
+        value={state.dollarsRisk}
+
+        onChange={({ target }) => setState({ ...state, [target.name]: Number(target.value) })}
+      />
+    </p>
+    : null;
+
   return (
     <div id="modalsContainer">
 
-      <Button id="changeBalanceModal" variant="contained" color="primary" style={{ position: 'relative', right: '15px', top: '50px', width: '300px'  }}
+      <Button id="changeBalanceModal" variant="contained" color="primary" style={{ position: 'relative', left: '440px', bottom: '50px', width: '300px'  }}
         onClick={handleClickOpen}
       >
         Set Risk Managment
@@ -113,6 +126,16 @@ const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults }) => {
             />
           </p>
           {setDollarsInput}
+          <p style={{ fontSize: '20px' }}>
+            Would You like to use balance rates risk managment?
+            <Checkbox
+              checked={state.useRatesRisk}
+              name="useRatesRisk"
+              onChange={handleChange}
+              inputProps={{ 'aria-label': 'primary checkbox' }}
+            />
+          </p>
+          {setRatesInput}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
