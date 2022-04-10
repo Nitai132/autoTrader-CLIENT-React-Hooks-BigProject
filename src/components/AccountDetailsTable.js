@@ -84,15 +84,14 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                 {userType === 'Real' && <span style={{ color: 'green' }}> Real Account</span>}
             </h2>
             <table style={{ marginLeft: 'auto', marginRight: 'auto', position: 'relative', top: '100px' }}>
-                <tbody>
-
+            {info.investedBalance &&  <tbody>
                     <tr>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Invested balance</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Current balance</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Profit/Loss</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Number of trades</th>
                         <th style={{ fontSize: '25px', padding: '20px' }}>Positions details</th>
-                    </tr>
+                    </tr> 
                     <tr>
                         <td style={{ fontSize: '20px' }}>
                             {info.investedBalance.dollars} $
@@ -107,14 +106,14 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                             sell: {info.tradesAmount.sell} trades
                         </td>
                         <td >
-                            <Button variant="contained" color="secondary"
+                            {userEmail !== '' && <Button variant="contained" color="secondary"
                                 onClick={() => window.open(`/positions`, '_blank')}
                             >
                                 Click Here to See info
-                            </Button>
+                            </Button>}
                         </td>
-                    </tr>
-                    <tr>
+                    </tr> 
+                    <tr> 
                         <td></td>
                         <td></td>
                         <td></td>
@@ -122,13 +121,13 @@ const AccountDetailsTable = ({ currentAccount, userEmail }) => {
                             buy: {info.tradesAmount.buy} trades
                         </td>
                         <td>
-                        <Button variant="contained" color="secondary"
+                        {userEmail !== '' && <Button variant="contained" color="secondary"
                             >
                                 Click Here to see reports
-                            </Button>
+                            </Button>}
                         </td>
                     </tr>
-                </tbody>
+                </tbody> }
             </table>
         </div>
     )

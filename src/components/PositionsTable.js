@@ -14,6 +14,9 @@ import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import InputLabel from '@material-ui/core/InputLabel';
+import alertify from 'alertifyjs';
+import 'alertifyjs/build/css/alertify.css';
+import 'alertifyjs/build/css/themes/default.css'
 
 
 const useStyles = makeStyles({ //יצירת סטיילינג
@@ -31,6 +34,8 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
     const [rowsPerPage, setRowsPerPage] = React.useState(11); //כמות שורות פר עמוד
     const [positions, setPositions] = React.useState([]);
     const [openSymbols, setOpenSymbols] = React.useState('');
+    const [trackRecord, setTrackRecord] = React.useState('');
+
 
 
 
@@ -71,6 +76,16 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
             minWidth: 50,
         },
         {
+            id: 'tp',
+            label: 'TP',
+            minWidth: 50,
+        },
+        {
+            id: 'sp',
+            label: 'SP',
+            minWidth: 50,
+        },
+        {
             id: 'succeeded',
             label: 'Succeeded',
             minWidth: 50,
@@ -95,11 +110,22 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
         EndDate,
         StartPrice,
         EndPrice,
+        tp,
+        sp,
         succeeded,
         PipsesCents,
         Precent
     ) {
-        return { Num, Symbol, Operation, StartDate, EndDate, StartPrice, EndPrice, succeeded, PipsesCents, Precent };
+        return { Num, Symbol, Operation, StartDate, EndDate, StartPrice, EndPrice, tp, sp, succeeded, PipsesCents, Precent };
+    }
+
+
+
+    const handleTrackRecordChange = ({ target }) => {
+        alertify.prompt('Set your starting capital', 'What was your capital when you first started using the system signal? ($)', '0'
+            , function (evt, value) { alertify.success('You entered: ' + value) }
+            , function () { alertify.error('Cancel') });
+        setTrackRecord(target.value);
     }
 
 
@@ -157,24 +183,23 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
         const userPositions = await axios.get(`/positions/getUserPositions/${details.data.email}`); // API שמביא את הפוזיציות של המשתמש
         let finalPositions = [];
         for (let i = 0; i < userPositions.data[0].bonds.length; i++) {
-            const bond = await axios.get(`positions/getbond/${userPositions.data[0].bonds[i].id}`); // כל הבונדים של המשתמש
-            console.log(bond)
+            const bond = await axios.get(`positions/getbond/${userPositions.data[0].bonds[i]}`); // כל הבונדים של המשתמש
             finalPositions.push(bond.data[0]);
         }
         for (let i = 0; i < userPositions.data[0].comodity.length; i++) {
-            const comodity = await axios.get(`positions/getComodity/${userPositions.data[0].comodity[i].id}`); // כל הקומודיטי של המשתמש
+            const comodity = await axios.get(`positions/getComodity/${userPositions.data[0].comodity[i]}`); // כל הקומודיטי של המשתמש
             finalPositions.push(comodity.data[0]);
         }
         for (let i = 0; i < userPositions.data[0].currencyPairs.length; i++) {
-            const currencyPair = await axios.get(`positions/getCurrencyPair/${userPositions.data[0].currencyPairs[i].id}`); // כל הקורנסי של המשתמש
+            const currencyPair = await axios.get(`positions/getCurrencyPair/${userPositions.data[0].currencyPairs[i]}`); // כל הקורנסי של המשתמש
             finalPositions.push(currencyPair.data[0]);
         }
         for (let i = 0; i < userPositions.data[0].indexes.length; i++) {
-            const rest = await axios.get(`positions/getRest/${userPositions.data[0].indexes[i].id}`); // כל הרסט של המשתמש
+            const rest = await axios.get(`positions/getRest/${userPositions.data[0].indexes[i]}`); // כל הרסט של המשתמש
             finalPositions.push(rest.data[0]);
         }
         for (let i = 0; i < userPositions.data[0].stocks.length; i++) {
-            const stock = await axios.get(`positions/getStock/${userPositions.data[0].stocks[i].id}`); // כל הסטוקס של המשתמש
+            const stock = await axios.get(`positions/getStock/${userPositions.data[0].stocks[i]}`); // כל הסטוקס של המשתמש
             finalPositions.push(stock.data[0]);
         }
 
@@ -184,6 +209,7 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
 
         let rows = [];
         let openPositionsEndDates = []
+        console.log(sortedPositions)
         for (let i = 0; i < sortedPositions.length; i++) { // לולאת פור על כל הפוזיציות של המשתמש
             if (sortedPositions[i].pipsed !== undefined) { //במידה ויש לפוזיציה פיפסים
                 sortedPositions[i].pipsed = sortedPositions[i].pipsed.toFixed(5); // מסדר את הפיפסים רק ל3 מספרים אחרי הנקודה
@@ -199,6 +225,8 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
                 sortedPositions[i].endDate,
                 sortedPositions[i].startPrice,
                 sortedPositions[i].endPrice,
+                sortedPositions[i].tp,
+                sortedPositions[i].sp.currentStopPrice,
                 String(sortedPositions[i].succeeded),
                 sortedPositions[i].pipsed,
                 sortedPositions[i].Precent
@@ -274,6 +302,24 @@ export default function StickyHeadTable(props) { //הפונקציה של הטב�
                 onChangePage={handleChangePage}
                 onChangeRowsPerPage={handleChangeRowsPerPage}
             />
+            <FormControl style={{ width: '180px', position: 'relative', bottom: '15px', float: 'right', right: '20px' }} >
+                <InputLabel style={{ width: '180px', color: 'black' }} >Track Records</InputLabel>
+                <NativeSelect style={{ width: '180px' }}
+                    value={openSymbols}
+                    onChange={handleTrackRecordChange}
+                >
+                    <option aria-label="None" value="" />
+                    <option value={'crypto-symbols'} onClick={() => alert('hello')}
+                    >
+                        Track-Record Crypto Symbols
+                    </option>
+                    <option value={'pairs-symbols'}>Track-Record Currency Pairs Symbols</option>
+                    <option value={'stocks-symbols'}>Track-Record Stocks Symbols</option>
+                    <option value={'bonds-symbols'}>Track-Record Bonds Symbols</option>
+                    <option value={'comodity-symbols'}>Track-Record Commodity Symbols</option>
+                    <option value={'indexes-symbols'}>Track-Record Indexes Symbols</option>
+                </NativeSelect>
+            </FormControl>
             <Button
                 onClick={() => downloadPdf(positions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage))}
                 variant="contained"

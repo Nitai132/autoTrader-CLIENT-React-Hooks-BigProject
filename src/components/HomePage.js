@@ -21,6 +21,7 @@ import ChooseFinancialModal from './ChooseFinancialModal';
 import RiskManagmentModal from './RiskManagmentModal';
 import SetTimeModal from './SetTimeModal';
 import SetStopLossModal from './SetStopLossModal';
+import SetTakeProfitModal from './setTakeProfitModal'
 import ExitPositionsModal from './ExitPositionsModal';
 import _ from 'lodash';
 import SetDoubleTheTrade from './SetDoubleTheTrade';
@@ -95,6 +96,7 @@ const HomePage = () => { //פונקציה דף ראשי
   const [riskManagment, setRiskManagment] = useState({});
   const [times, setTimes] = useState({});
   const [stopLoss, setStopLoss] = useState({});
+  const [takeProfit, setTakeProfit] = useState({});
   const [symbols, setSymbols] = useState([]);
   const [tradesPerDay, setTradesPerDay] = useState(0);
   const [stocksRates, setStocksRates] = useState({});
@@ -223,6 +225,7 @@ const HomePage = () => { //פונקציה דף ראשי
           times,
           symbols,
           rates,
+          takeProfit,
           tradesPerDay,
           doubleTheTradeValues
         }).then(() => {
@@ -274,6 +277,7 @@ const HomePage = () => { //פונקציה דף ראשי
       setRiskManagment(data[currentAccount].riskManagment);
       setTimes(data[currentAccount].times);
       setStopLoss(data[currentAccount].stopLoss);
+      setTakeProfit(data[currentAccount].takeProfit);
       setStocksRates(data[currentAccount].rates.stocks);
       setOptionsRates(data[currentAccount].rates.options);
       setFutureContractsRatesRates(data[currentAccount].rates.futureContracts);
@@ -293,6 +297,7 @@ const HomePage = () => { //פונקציה דף ראשי
       setRiskManagment(data[currentAccount].riskManagment);
       setTimes(data[currentAccount].times);
       setStopLoss(data[currentAccount].stopLoss);
+      setTakeProfit(data[currentAccount].takeProfit);
       setStocksRates(data[currentAccount].rates.stocks);
       setOptionsRates(data[currentAccount].rates.options);
       setFutureContractsRatesRates(data[currentAccount].rates.futureContracts);
@@ -536,8 +541,15 @@ const HomePage = () => { //פונקציה דף ראשי
             setOpen={(value) => setOpenExitModal(value)}
             userEmail={userEmail}
           />
+          <SetTakeProfitModal
+            currentAccount={currentAccount}
+            setTakeProfit={(values) => setTakeProfit(values)}
+            defaults={takeProfit}
+            unSavedChangesFlag={(flag) => unSavedChangesFlag(flag)}
+
+          />
           <br />
-          <span style={{ fontSize: '20px', position: 'relative', right: '420px', bottom: '15px' }}>
+          <span style={{ fontSize: '20px', position: 'relative', right: '420px', bottom: '55px' }}>
             Amount of trades per day (1-20)
             <input type="number" style={{ width: '30px' }} min="0" max="20"
               value={tradesPerDay}
@@ -546,15 +558,10 @@ const HomePage = () => { //פונקציה דף ראשי
           </span>
           <br />
 
-          <Button variant="contained" color="secondary" style={{ position: 'relative', bottom: '45px', left: '150px', width: '300px' }}
+          <Button variant="contained" color="secondary" style={{ position: 'relative', bottom: '85px', width: '300px' }}
             onClick={() => saveChanges()}
           >
             Save changes
-          </Button>
-          <Button variant="contained" style={{ position: 'relative', right: '150px', bottom: '142px', backgroundColor: 'lightgreen', width: '300px' }}
-            onClick={() => console.log(symbols)}
-          >
-            Take profits
           </Button>
         </div>
       </div>

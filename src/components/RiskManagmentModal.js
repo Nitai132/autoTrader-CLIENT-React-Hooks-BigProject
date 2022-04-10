@@ -79,10 +79,10 @@ const RiskManagmentModal = ({ currentAccount, setRiskManagment, defaults, unSave
 
     const setRatesInput = state.useRatesRisk
     ? <p>
-      please set the rates risk managment by precentage of dollars lost from total balance
+      please set the rates risk managment by precentage (%) of dollars ($) that was lost from your total balance
       <input type="number"
-        name="dollarsRisk"
-        value={state.dollarsRisk}
+        name="ratesRisk"
+        value={state.ratesRisk}
 
         onChange={({ target }) => setState({ ...state, [target.name]: Number(target.value) })}
       />
