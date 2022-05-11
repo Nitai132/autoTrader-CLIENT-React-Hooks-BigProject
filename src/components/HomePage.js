@@ -25,6 +25,7 @@ import SetTakeProfitModal from './setTakeProfitModal'
 import ExitPositionsModal from './ExitPositionsModal';
 import _ from 'lodash';
 import SetDoubleTheTrade from './SetDoubleTheTrade';
+import socketIOClient from 'socket.io-client';
 
 
 // פונקציה שמוצאת ברייק פוינטס רספונסיביים ומחלקת אותם לקטגוריות לפי גודל המסך
@@ -116,6 +117,22 @@ const HomePage = () => { //פונקציה דף ראשי
       : undefined
   );
   const [openExitModal, setOpenExitModal] = React.useState(false);
+  const [data, setData] = useState('');
+
+  useEffect(() => {
+    const socket = socketIOClient('http://localhost:3007',
+    {
+      cors: {
+        origin: "http://localhost:4423",
+        methods: ["GET", "POST"]
+    }
+    });
+    console.log(socket)
+    socket.on("message", data => {
+      setData(data);
+      console.log(data);
+    });
+  }, [])
 
   useEffect(() => {
     //הנדלר שנקרא ברגע שיש שינוי בגודל המסך
